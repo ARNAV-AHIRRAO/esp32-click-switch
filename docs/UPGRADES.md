@@ -2,6 +2,10 @@
 
 Version 1 (this repository) works over a USB cable. Everything below is an upgrade path. Nothing on this page is needed to use version 1.
 
+- Wireless with same functionality
+- Esp32 can act as a independent keyboard
+- Enable and disable the program anytime
+
 ## Why wireless is easy here
 
 The ESP32 only sends short text messages (`1`, `2`, `H`, `R`). In the code this happens in exactly one place on each side:
