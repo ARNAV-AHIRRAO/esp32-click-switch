@@ -1,0 +1,5 @@
+mediapipe==1.1.0
+opencv-python==5.0.0.93
+pyautogui==0.9.54
+pystray==0.19.5
+pillow==12.3.0
