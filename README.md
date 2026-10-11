@@ -1,3 +1,5 @@
+No ESP32? Try the software-only version that uses your webcam: [software-only branch](https://github.com/ARNAV-AHIRRAO/esp32-click-switch/tree/software-only).
+
 # ESP32 Click Switch
 
 Press one small button to switch windows on your Windows laptop. Click once, twice, three times and so on, and each count does a different thing. By default it switches windows (Alt+Tab). You can change every click to open an app, lock the PC, play music and much more, without touching any hardware.
