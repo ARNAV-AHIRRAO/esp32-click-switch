@@ -50,43 +50,60 @@ The hole numbers in the picture (B1, B4, A58, J60) are just an example. Your but
    - Open Arduino IDE. Click **File**, then **Preferences**.
    - In **Additional boards manager URLs**, paste: `https://espressif.github.io/arduino-esp32/package_esp32_index.json` and click **OK**.
    - Click **Tools**, then **Board**, then **Boards Manager**. Search `esp32`. Install **esp32 by Espressif Systems**.
-4. **Two Python libraries:** press the Windows key + R, type `cmd`, press Enter. In the black window type this and press Enter:
+4. **Python libraries:** press the Windows key + R, type `cmd`, press Enter. In the terminal, run:
 
 ```
-pip install pyserial pynput
+pip install -r software/requirements.txt
 ```
+*(Includes `pyserial` and `pynput`, plus optional `pystray` and `pillow` for Windows System Tray support)*
 
 ## Step 3. Put the program on the ESP32 (once)
 
 1. On this page click the green **Code** button, then **Download ZIP**. Unzip it.
 2. Open Arduino IDE. Click **File**, then **Open**, and pick `firmware/click_switch/click_switch.ino`.
 3. Click **Tools**, then **Board**, then **esp32**, then **ESP32 Dev Module**.
-4. Click **Tools**, then **Port**, and pick the COM port that appears when the ESP32 is plugged in. Write the number down (for example COM3).
-5. Click the **right arrow** button at the top left (Upload). Wait for the message `Hard resetting via RTS pin`.
+4. Click **Tools**, then **Port**, and pick the COM port of your ESP32.
+5. Click the **right arrow** button at the top left (Upload). Wait for `Hard resetting via RTS pin`.
    - If it is stuck on `Connecting......`, hold the **BOOT** button on the ESP32 until the upload starts.
 
 The program now lives inside the ESP32. You never need to upload it again.
 
+> [!TIP]
+> **Want 100% Wireless without running any Python?** Check out [firmware/ble_switch/ble_switch.ino](firmware/ble_switch/ble_switch.ino) to turn your ESP32 into a native Bluetooth HID keyboard that works on Windows, Mac, iPad, and Android!
+
 ## Step 4. Run it
 
-1. Find your port number: press Windows key + X, open **Device Manager**, open **Ports (COM & LPT)**. Look for the number of your ESP32.
-2. Not COM3? Open `software/switch.py` in Notepad. Find the line `ser = serial.Serial('COM3', 115200)` and change `COM3` to your number. Save.
-3. Open the `software` folder in File Explorer. Click the address bar, type `cmd`, press Enter.
-4. Type `python switch.py` and press Enter.
-5. You should see `Connected COM3`. Leave this window open.
+1. Open the `software` folder in File Explorer. Click the address bar, type `cmd`, and press Enter.
+2. Type `python switch.py` and press Enter.
+3. **Auto-Detection:** The script automatically discovers your ESP32 board! You should see `Connected to ESP32 on COMx`.
+4. A mini **System Tray icon** will appear in the Windows notification area with quick controls (Pause, Reload Config, Exit).
 
 ## Step 5. Try it
 
-Open a few windows, then click the button. The black window prints what it understood, for example `2 clicks -> Alt+Tab x2`.
+Open a few windows, then click the button:
+- **1 to 5 clicks:** Switches windows (`Alt+Tab x1`, `Alt+Tab x2`, etc.).
+- **Hold for 1.5 seconds:** Window switcher opens and stays visible. Let go to pick the window.
+- **Hold for 4.0 seconds (Panic Lock):** Instantly locks your PC.
+- **Onboard LED:** The blue LED on the ESP32 lights up on every press and hold for instant physical feedback!
 
-## Make it yours
+## Make it yours (No Code Required!)
 
-Open `software/switch.py` and find the block called `ACTIONS`. Each line says: number of clicks, a name, and what to do. Replace a line with one from [docs/ACTIONS.md](docs/ACTIONS.md), save, and run the program again. For example:
+You do **not** need to touch Python code to customize actions! Open `software/config.json` in Notepad or VS Code:
 
-```python
-1: ("Open Chrome", lambda: open_app(r"C:\Program Files\Google\Chrome\Application\chrome.exe")),
-2: ("Lock PC", lambda: ctypes.windll.user32.LockWorkStation()),
+```json
+{
+  "actions": {
+    "1": { "name": "Alt+Tab x1", "type": "alt_tab", "times": 1 },
+    "2": { "name": "Alt+Tab x2", "type": "alt_tab", "times": 2 },
+    "3": { "name": "Show Desktop", "type": "hotkey", "keys": ["cmd", "d"] },
+    "4": { "name": "Play / Pause", "type": "media", "command": "play_pause" },
+    "5": { "name": "Open Chrome", "type": "open", "target": "chrome.exe" },
+    "9": { "name": "Lock Workstation", "type": "power", "command": "lock" }
+  }
+}
 ```
+
+Save the file, and `switch.py` will **automatically reload** your new configuration without restarting! See [docs/ACTIONS.md](docs/ACTIONS.md) for more examples.
 
 ## Start automatically with Windows (optional)
 
@@ -94,7 +111,7 @@ Open `software/switch.py` and find the block called `ACTIONS`. Each line says: n
 2. Right-click in the folder, choose **New**, then **Shortcut**.
 3. Paste this as the location, with your real path to `switch.py`: `pythonw.exe "C:\path\to\switch.py"`. Click **Next**, then **Finish**.
 
-It now runs hidden at every start. To stop it: Task Manager, find `pythonw.exe`, **End task**. Stop it before uploading new code to the ESP32, because it holds the USB port.
+It now runs hidden with a System Tray icon at every Windows start. To pause it while gaming or typing, right-click the tray icon and select **Pause Shortcuts**.
 
 ## Something wrong?
 
@@ -102,17 +119,16 @@ It now runs hidden at every start. To stop it: Task Manager, find `pythonw.exe`,
 |---|---|
 | No COM port shows up | You are using a charge-only cable. Use a data cable. Try another USB port |
 | Upload stuck on `Connecting......` | Hold the BOOT button on the ESP32 while uploading |
-| `could not open port` or `Access is denied` | Another program is using the port. Close Arduino Serial Monitor and any other Python window. End `pythonw.exe` in Task Manager |
-| `No module named 'serial'` | Type `pip install pyserial` (not `serial`) |
-| Nothing happens when clicking | Close the black window. In Arduino IDE open **Tools**, **Serial Monitor**, set **115200** at the bottom right, and click the button. Numbers should appear. If not, check the wiring |
+| `could not open port` or `Access is denied` | Another program is using the port. Close Arduino Serial Monitor. Right-click the system tray icon and click Exit |
+| `No module named 'serial'` | Type `pip install -r software/requirements.txt` |
+| Nothing happens when clicking | The blue LED on the ESP32 should turn on when pressed. If not, check the breadboard wiring |
 | `HOLD` appears by itself | The two wires are not on diagonal legs. Move one wire to the diagonal leg |
-| Alt key feels stuck | Tap the Alt key once. Then close and restart the program |
-| `Ctrl+C` does not stop the program | Click the button once, then it stops |
+| Alt key feels stuck | Tap the Alt key once. The program automatically releases Alt on exit |
 
 ## More
 
-- [How it works step by step](docs/HOW_IT_WORKS.md) (from upload to key press)
-- [All the things a click can do](docs/ACTIONS.md)
-- [Wireless and future upgrades](docs/UPGRADES.md)
+- [How it works step by step](docs/HOW_IT_WORKS.md) (circuit, timing, firmware, and Python driver)
+- [All the things a click can do](docs/ACTIONS.md) (actions and `config.json` recipes)
+- [Wireless and future upgrades](docs/UPGRADES.md) (BLE Keyboard, Wi-Fi UDP, and Rotary Encoder)
 
-Works on Windows only (the app-opening and power functions are Windows functions).
+Works on Windows. For wireless cross-platform use (Mac, Linux, iPad), see the BLE Keyboard mode.
