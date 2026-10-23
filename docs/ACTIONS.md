@@ -1,36 +1,43 @@
 # Action List: What a Click Can Do
 
-## How to use this page
+You can configure what every click does in two ways:
+1. **In `software/config.json` (Recommended, no code needed):** Edit JSON and save. It automatically reloads while the program runs!
+2. **In `software/switch.py`:** Directly edit Python code in the `ACTIONS` dictionary.
 
-1. Open `software/switch.py` and find the `ACTIONS` block.
-2. Pick the number of clicks you want (for example `3`).
-3. Copy a line from the "Code" column below, and put it after the number.
-4. Save the file and run the program again.
+---
 
+## 1. Using `config.json` (Recommended)
+
+Open `software/config.json`. Each entry in `"actions"` has:
+- `"name"`: Label printed on screen / logged
+- `"type"`: One of `"alt_tab"`, `"hotkey"`, `"media"`, `"open"`, `"web"`, `"power"`, `"type"`, `"run"`
+
+### Supported JSON Action Types:
+
+| Type | Example JSON | What it does |
+|---|---|---|
+| `"alt_tab"` | `{"type": "alt_tab", "times": 2}` | Cycles windows twice |
+| `"hotkey"` | `{"type": "hotkey", "keys": ["cmd", "d"]}` | Presses Win + D (Show Desktop) |
+| `"media"` | `{"type": "media", "command": "play_pause"}` | Play/Pause (`next`, `prev`, `vol_up`, `vol_down`, `mute`) |
+| `"open"` | `{"type": "open", "target": "calc"}` | Launches Calculator or an executable path |
+| `"web"` | `{"type": "web", "target": "https://youtube.com"}` | Opens URL in default browser |
+| `"power"` | `{"type": "power", "command": "lock"}` | Locks workstation (`lock`, `sleep`, `screen_off`, `shutdown`) |
+| `"type"` | `{"type": "type", "text": "hello@example.com"}` | Auto-types text snippet |
+| `"run"` | `{"type": "run", "command": "ipconfig"}` | Runs shell command |
+
+---
+
+## 2. Using Python code (`switch.py`)
+
+If you prefer editing the Python dictionary directly:
 Format of one line:
 
 ```python
 3: ("Show desktop", lambda: hotkey(Key.cmd, 'd')),
 ```
 
-The three parts are: click count, a name that is printed on screen, and the action. Every action must start with `lambda:`, except plain function names such as `show_desktop` or `sleep_pc`.
-
-A full example table:
-
-```python
-ACTIONS = {
-    1: ("Alt+Tab x1", lambda: alt_tab(1)),
-    2: ("Alt+Tab x2", lambda: alt_tab(2)),
-    3: ("Show desktop", show_desktop),
-    4: ("Open Chrome", lambda: open_app(r"C:\Program Files\Google\Chrome\Application\chrome.exe")),
-    5: ("Play / pause", lambda: tap(Key.media_play_pause)),
-    9: ("Lock PC", lambda: ctypes.windll.user32.LockWorkStation()),
-}
-```
-
 Safety tip: put risky actions (shutdown, restart, sign out, close window) on high click counts such as 7, 8 or 9. Then an accidental double click can never trigger them.
 
-Helper functions already in `switch.py`: `tap`, `hotkey`, `run`, `web`, `open_app`, `alt_tab`, `show_desktop`, `sleep_pc`.
 
 ## Power
 

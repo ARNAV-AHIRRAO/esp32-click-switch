@@ -28,8 +28,12 @@ Each message is one line of text:
 | Message | Meaning |
 |---|---|
 | `1`, `2`, `3` ... | The button was clicked that many times in a quick row |
-| `H` | The button has been held down for 1.5 seconds |
-| `R` | The button was released after a hold |
+| `H` | Stage 1 Hold: button held down for 1.5 seconds (Task Switcher peek) |
+| `R` | Button released after Stage 1 hold (Window picked) |
+| `H2` | Stage 2 Hold: button held down for 4.0 seconds (Emergency Panic Lock) |
+| `R2` | Button released after Stage 2 hold |
+| `CW` | Rotary knob turned clockwise (Volume Up / Forward) |
+| `CCW` | Rotary knob turned counter-clockwise (Volume Down / Backward) |
 
 ## Phase 1. When you press Upload in Arduino IDE
 

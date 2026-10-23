@@ -1,0 +1,76 @@
+{
+  "settings": {
+    "port": "auto",
+    "baudrate": 115200,
+    "system_tray": true,
+    "notifications": true
+  },
+  "actions": {
+    "1": {
+      "name": "Alt+Tab x1",
+      "type": "alt_tab",
+      "times": 1
+    },
+    "2": {
+      "name": "Alt+Tab x2",
+      "type": "alt_tab",
+      "times": 2
+    },
+    "3": {
+      "name": "Show Desktop",
+      "type": "hotkey",
+      "keys": ["cmd", "d"]
+    },
+    "4": {
+      "name": "Media Play / Pause",
+      "type": "media",
+      "command": "play_pause"
+    },
+    "5": {
+      "name": "Mute Audio",
+      "type": "media",
+      "command": "mute"
+    },
+    "6": {
+      "name": "Open Calculator",
+      "type": "open",
+      "target": "calc"
+    },
+    "7": {
+      "name": "Open YouTube",
+      "type": "web",
+      "target": "https://youtube.com"
+    },
+    "8": {
+      "name": "Task Manager",
+      "type": "hotkey",
+      "keys": ["ctrl", "shift", "esc"]
+    },
+    "9": {
+      "name": "Lock Workstation",
+      "type": "power",
+      "command": "lock"
+    }
+  },
+  "gestures": {
+    "hold_1": {
+      "name": "Task Switcher Peek (Hold to view, release to pick)",
+      "type": "switcher_peek"
+    },
+    "hold_2": {
+      "name": "Stage 2 Panic Lock (4s hold)",
+      "type": "power",
+      "command": "lock"
+    },
+    "rotary_cw": {
+      "name": "Rotary Clockwise: Volume Up",
+      "type": "media",
+      "command": "vol_up"
+    },
+    "rotary_ccw": {
+      "name": "Rotary Counter-Clockwise: Volume Down",
+      "type": "media",
+      "command": "vol_down"
+    }
+  }
+}

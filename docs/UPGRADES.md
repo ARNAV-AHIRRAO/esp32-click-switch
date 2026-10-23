@@ -186,50 +186,37 @@ What it does: it listens for the ESP32's messages, ignores the duplicate copy, i
 
 The `SECRET` is sent as plain text. It stops accidents and pranks on a shared network, not a determined attacker. Keep shutdown and similar actions on high click counts.
 
-## Upgrade ideas
+## Implemented Upgrades in this Repository
+
+The repository includes several production-grade upgrades out of the box:
+
+### 1. Native BLE Wireless Keyboard (No Python Needed!)
+Located in **[firmware/ble_switch/ble_switch.ino](../firmware/ble_switch/ble_switch.ino)**:
+- Emulates a standard Bluetooth HID keyboard directly from the ESP32.
+- Pairs directly to Windows, macOS, Linux, Android, or iPadOS with **no host software or drivers**.
+- Sends native media controls (`KEY_MEDIA_PLAY_PAUSE`), shortcuts (`Alt+Tab`, `Win+D`), and panic lock (`Win+L`).
+- Onboard LED blinks while advertising and turns solid when paired.
+
+### 2. Rotary Encoder Knob Integration
+Located in **[firmware/rotary_switch/rotary_switch.ino](../firmware/rotary_switch/rotary_switch.ino)**:
+- Combines an EC11 Rotary Encoder with the click switch.
+- Turning the knob sends `"CW"` (Clockwise) and `"CCW"` (Counter-Clockwise) for smooth volume adjustment or timeline scrubbing.
+- Pressing the knob shaft runs the multi-click and hold actions.
+
+### 3. Auto COM Port Discovery & Live-Reload JSON Config
+- **Zero manual port config:** Automatically scans connected USB devices and pairs with ESP32 boards (CP210x, CH340, FTDI, Espressif native CDC).
+- **`config.json`:** Customize actions without writing code. Changes reload live without restarting the program.
+- **System Tray Icon:** Minimizes to the Windows notification tray with pause toggle, config reload, and status indicator.
+
+---
+
+## Additional Upgrade Ideas
 
 | Upgrade | What it gives | Rough difficulty | What to change |
 |---|---|---|---|
-| **No-code settings window** | Anyone can set what each click does by choosing from menus and a Browse button for apps. No code visible | Medium | New `config.json` plus a small settings window (Python `tkinter`). `switch.py` reads the file at start |
-| **Auto-find the COM port** | No need to edit `COM3` | Easy | Use `serial.tools.list_ports` and pick the board by its USB ID |
-| More buttons | More shortcuts (for example one button per app) | Medium | One more pin per button, messages like `B:2` for button B |
-| Click modes | 7 clicks cycles Work, Media, Presentation. Each mode has its own table | Easy | Keep a `mode` variable and one `ACTIONS` table per mode |
-| App-aware clicks | Same click does different things in PowerPoint and Chrome | Medium | `pygetwindow` reads the title of the front window |
-| New hold gestures | Hold 1.5 s peek, hold 4 s lock, click then hold, and so on | Medium | Firmware sends new messages (for example `H2`). Table handles them |
-| Lights and sound | LED blink, beep or an OLED text on every click | Easy | Add output pins in the firmware |
+| Click modes | 7 clicks cycles Work, Media, Presentation. Each mode has its own table | Easy | Keep a `mode` variable and one table per mode |
+| App-aware clicks | Same click does different things in PowerPoint and Chrome | Medium | `pip install pygetwindow` to read the front window title |
 | Smart home | Click to switch a light, plug or scene | Medium | `requests.get(url)` to IFTTT, Home Assistant or a smart plug |
-| Own program, no Python needed | Share with friends | Medium | Package with PyInstaller into one `.exe` |
-| macOS or Linux | More users | Medium | Replace `os.startfile`, `ctypes.windll`, Windows shortcuts |
-| Battery | Fully wire-free | Medium | LiPo battery, charger board, ESP32 deep sleep that wakes on a button press |
-| Proper enclosure | Looks like a product | Easy | 3D-printed case. Later a soldered board or a custom PCB |
+| Standalone `.exe` | Share with friends without Python setup | Easy | `pip install pyinstaller`, then `pyinstaller --onefile --noconsole switch.py` |
+| LiPo Battery & Enclosure | Fully wire-free desk gadget | Medium | 3.7V LiPo + TP4056 charger board + 3D printed case |
 
-### Design for the no-code settings window
-
-Store the choices in a plain file:
-
-```json
-{
-  "actions": {
-    "1": {"type": "alt_tab", "times": 1},
-    "2": {"type": "open", "target": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"},
-    "3": {"type": "hotkey", "keys": ["cmd", "d"]},
-    "4": {"type": "lock"}
-  }
-}
-```
-
-The settings window has one row per click count with a drop-down for the action type (open app or file, website, hotkey, power) and a **Browse** button that fills in the path. **Save** writes the file. `switch.py` loads it and builds the `ACTIONS` table from it, so users never open the code.
-
-### Finding the COM port automatically
-
-```python
-from serial.tools import list_ports
-
-
-def find_port():
-    for p in list_ports.comports():
-        if p.vid in (0x10C4, 0x1A86):
-            return p.device
-```
-
-`0x10C4` is the chip family used on many ESP32 boards and `0x1A86` is another very common one. Use the returned name in place of `'COM3'`.
